@@ -64,12 +64,12 @@ class gcloudsdk (
 
   notice($download_source)
 
-  archive { "${download_file_name}.tar.gz":
+  archive { "/tmp/${download_file_name}.tar.gz":
     ensure       => present,
     extract      => true,
     extract_path => $install_dir,
     source       => $download_source,
-    checksum     => false,
+    creates      => "${install_dir}/google-cloud-sdk",
   }
 
 
