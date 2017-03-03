@@ -81,7 +81,7 @@ class gcloudsdk (
     creates => "${install_path}/bin/gcloud",
     cwd     => "${install_dir}/google-cloud-sdk",
     command => '/bin/echo "" | ./install.sh --usage-reporting false --disable-installation-options --bash-completion false',
-    require => Archive::Extract[$download_file_name],
+    require => Archive["/tmp/${download_file_name}.tar.gz"],
   }
 
 
