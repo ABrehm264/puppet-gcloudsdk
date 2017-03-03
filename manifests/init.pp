@@ -25,7 +25,7 @@ class gcloudsdk (
   $is_install_pubsub_emulator = $::gcloudsdk::params::is_install_pubsub_emulator,
   $is_install_gcd_emulator = $::gcloudsdk::params::is_install_gcd_emulator,
   ) inherits ::gcloudsdk::params {
-    
+
   #Validate Tools Installation Set up
   validate_bool($is_install_gcloud)
   validate_bool($is_install_gsutil)
@@ -38,10 +38,10 @@ class gcloudsdk (
   validate_bool($is_install_alpha)
   validate_bool($is_install_pubsub_emulator)
   validate_bool($is_install_gcd_emulator)
-  
+
   # Validates if the installation directory path exists
   validate_absolute_path($install_dir)
-  
+
   # Check the Architecture of Node to form the download URL
   if $::architecture == 'amd64' or $::architecture == 'x86_64' {
     $arch = 'x86_64'
@@ -55,7 +55,7 @@ class gcloudsdk (
   } else {
     $download_file_name = "google-cloud-sdk-${version}-linux-${arch}"
   }
-  
+
 
   # GCloud SDK Download URL
   $download_source = "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${download_file_name}.tar.gz"
@@ -67,17 +67,18 @@ class gcloudsdk (
   # The below block of code downloads the google-cloud-sdk archive file.
   archive::download{ "${download_file_name}.tar.gz":
     url        => $download_source,
-    src_target => '/tmp',
+    src_target => '/tmp'
     checksum   => false,
   }
-  
+
   # The below block of code extracts the google-cloud-sdk archive file.
-  archive::extract { $download_file_name:
-    target     => $install_dir,
-    src_target =>'/tmp',
-    require    => Archive::Download["${download_file_name}.tar.gz"],
+  archive { "${download_file_name}.tar.gz":
+    extract      => true,
+    extract_path => $install_dir,
+    source       => "/tmp${download_file_name}.tar.gz",
+    require      => Archive::Download["${download_file_name}.tar.gz"],
   }
-  
+
   # The below block of code installs the google-cloud-sdk archive file.
   $install_path = "${install_dir}/google-cloud-sdk"
   exec { 'install Google Cloud SDK':
@@ -87,9 +88,9 @@ class gcloudsdk (
     command => '/bin/echo "" | ./install.sh --usage-reporting false --disable-installation-options --bash-completion false',
     require => Archive::Extract[$download_file_name],
   }
-  
-  
-  
+
+
+
   # The below code will set the google-cloud-sdk path inside the PATH env variable.
   file { '/etc/profile.d/gcloud_path.sh':
     ensure  => file,
@@ -101,7 +102,7 @@ class gcloudsdk (
     command   => 'sh /etc/profile.d/gcloud_path.sh',
     logoutput => on_failure,
   }
-  
+
   # The below code will install the selected addtional components. (only if any additional components is set to true)
   file { '/tmp/sdk_add_components.sh':
     ensure  => file,
@@ -113,7 +114,7 @@ class gcloudsdk (
     command   => 'sh /tmp/sdk_add_components.sh',
     logoutput => on_failure,
   }
-  
+
   # The below code will Update the components to latest version. (only if version is set to LATEST)
   file { '/tmp/sdk_update_components.sh':
     ensure  => file,
@@ -125,7 +126,7 @@ class gcloudsdk (
     command   => 'sh /tmp/sdk_update_components.sh',
     logoutput => on_failure,
   }
-  
+
   # The below code will uninstall the selected default components. (only if default components installation is set to false)
   file { '/tmp/sdk_remove_components.sh':
     ensure  => file,
@@ -137,11 +138,11 @@ class gcloudsdk (
     command   => 'sh /tmp/sdk_remove_components.sh',
     logoutput => on_failure,
   }
-  
-  
+
+
   $ua_module_name = 'RanjithKumar45/gcloudsdk'
   $ua_module_version = "${ua_module_name}/1.2.0"
-  
+
   file { '/tmp/agent.sh':
     ensure  => file,
     mode    => '0755',
@@ -154,6 +155,3 @@ class gcloudsdk (
   }
 
 }
-
-
-
