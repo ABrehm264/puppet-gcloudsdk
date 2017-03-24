@@ -65,6 +65,7 @@ class gcloudsdk (
   notice($download_source)
 
   archive { "/tmp/${download_file_name}.tar.gz":
+    provider     => 'wget',
     extract      => true,
     extract_path => $install_dir,
     source       => $download_source,
